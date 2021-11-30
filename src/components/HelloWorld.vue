@@ -1,22 +1,22 @@
 <template>
-  <div id="top">
-    <template v-if="loading">
-        <div>Spinner</div>
-    </template>
-
-    <LineChart v-if="!loading" :labels="labels" :dataset="data" :minValue="minValue" :maxValue="maxValue"></LineChart>
+  <div class="container">
+    <Spinner v-if="loading"></Spinner>
+    <div id="top" v-if="!loading">
+      <LineChart :labels="labels" :dataset="data" :minValue="minValue" :maxValue="maxValue"></LineChart>
+    </div>
   </div>
-  
 </template>
 
 <script>
 import axios from 'axios'
 import LineChart from "./LineChart.vue"
+import Spinner from "./Spinner.vue"
 
 export default {
   name: 'HelloWorld',
   components: {
-    LineChart
+    LineChart,
+    Spinner
   },
   data() {
     return {
@@ -32,12 +32,13 @@ export default {
   },
   methods: {
       getDataFromApi() {
-          axios.get('http://localhost:3100/getFollowers')
+          axios.get('https://fo-analytics.herokuapp.com/getFollowers')
           .then(response => {
               var data = response.data.map(x => x.value);
               this.labels = response.data.map(x => x.date);
               this.data = data;
-              this.minValue = Math.min(...data) - 500;
+              let minValue = Math.min(...data);
+              this.minValue = minValue > 500 ? minValue - 500 : minValue;
               this.maxValue = Math.max(...data) + 500;
               this.loading = false;
           })
@@ -52,18 +53,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+#top {
+  width: 30%;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+
 </style>
